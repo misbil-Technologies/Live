@@ -7,6 +7,7 @@ class LandingPage {
         this.setupNavigation();
         this.setupScrollEffects();
         this.setupAnimations();
+        this.setupDemoCredentials();
     }
 
     setupNavigation() {
@@ -17,6 +18,7 @@ class LandingPage {
         if (mobileToggle && navMenu) {
             mobileToggle.addEventListener('click', () => {
                 navMenu.classList.toggle('active');
+                mobileToggle.classList.toggle('active');
             });
         }
 
@@ -87,6 +89,18 @@ class LandingPage {
                 transform: translateY(0);
             }
 
+            .mobile-menu-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .mobile-menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .mobile-menu-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+
             .nav-menu.active {
                 display: flex;
                 position: absolute;
@@ -97,6 +111,7 @@ class LandingPage {
                 flex-direction: column;
                 padding: 2rem;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
             }
 
             @media (max-width: 768px) {
@@ -147,63 +162,62 @@ class LandingPage {
             counterObserver.observe(counter);
         });
     }
+
+    setupDemoCredentials() {
+        // Add demo credentials info for login button
+        const loginBtn = document.querySelector('.login-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', (e) => {
+                // Show demo credentials tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'demo-tooltip';
+                tooltip.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: white;
+                        padding: 2rem;
+                        border-radius: 12px;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                        z-index: 10000;
+                        text-align: center;
+                        max-width: 400px;
+                    ">
+                        <h3 style="margin-bottom: 1rem; color: #1a202c;">Demo Credentials</h3>
+                        <p style="margin-bottom: 1rem; color: #4a5568;">Use these credentials to try the platform:</p>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <strong>Email:</strong> demo@example.com<br>
+                            <strong>Password:</strong> demo123
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" style="
+                            background: linear-gradient(135deg, #667eea, #764ba2);
+                            color: white;
+                            border: none;
+                            padding: 0.75rem 1.5rem;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                        ">Got it!</button>
+                    </div>
+                    <div style="
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0,0,0,0.5);
+                        z-index: 9999;
+                    " onclick="this.parentElement.remove()"></div>
+                `;
+                document.body.appendChild(tooltip);
+            });
+        }
+    }
 }
 
 // Initialize landing page
 document.addEventListener('DOMContentLoaded', () => {
     new LandingPage();
-});
-
-// Demo functionality
-document.addEventListener('DOMContentLoaded', () => {
-    // Add demo credentials info
-    const loginBtn = document.querySelector('.login-btn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', (e) => {
-            // Show demo credentials tooltip
-            const tooltip = document.createElement('div');
-            tooltip.className = 'demo-tooltip';
-            tooltip.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 12px;
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-                    z-index: 10000;
-                    text-align: center;
-                    max-width: 400px;
-                ">
-                    <h3 style="margin-bottom: 1rem; color: #1a202c;">Demo Credentials</h3>
-                    <p style="margin-bottom: 1rem; color: #4a5568;">Use these credentials to try the platform:</p>
-                    <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                        <strong>Email:</strong> demo@example.com<br>
-                        <strong>Password:</strong> demo123
-                    </div>
-                    <button onclick="this.parentElement.parentElement.remove()" style="
-                        background: linear-gradient(135deg, #667eea, #764ba2);
-                        color: white;
-                        border: none;
-                        padding: 0.75rem 1.5rem;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 600;
-                    ">Got it!</button>
-                </div>
-                <div style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0,0,0,0.5);
-                    z-index: 9999;
-                " onclick="this.parentElement.remove()"></div>
-            `;
-            document.body.appendChild(tooltip);
-        });
-    }
 });
