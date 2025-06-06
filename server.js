@@ -78,9 +78,34 @@ const authenticateToken = (req, res, next) => {
 
 // Routes
 
-// Home page
+// Landing page (main homepage)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'landing.html'));
+});
+
+// Interview setup page (original functionality)
+app.get('/interview-setup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Interview session page
+app.get('/interview', (req, res) => {
+  res.sendFile(path.join(__dirname, 'interview.html'));
+});
+
+// Interview results page
+app.get('/results', (req, res) => {
+  res.sendFile(path.join(__dirname, 'results.html'));
+});
+
+// Agents demo page
+app.get('/agents', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index-agents.html'));
+});
+
+// WebSocket streaming demo
+app.get('/ws-streaming', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index-ws.html'));
 });
 
 // Authentication pages
@@ -101,25 +126,18 @@ app.get('/dashboard', (req, res) => {
 });
 
 // Interview pages (protected)
-app.get('/interview-setup', (req, res) => {
-  if (!req.session.token) {
-    return res.redirect('/login');
-  }
-  res.sendFile(path.join(__dirname, 'interview/setup.html'));
-});
-
 app.get('/interview-session', (req, res) => {
   if (!req.session.token) {
     return res.redirect('/login');
   }
-  res.sendFile(path.join(__dirname, 'interview/session.html'));
+  res.sendFile(path.join(__dirname, 'interview.html'));
 });
 
 app.get('/interview-results', (req, res) => {
   if (!req.session.token) {
     return res.redirect('/login');
   }
-  res.sendFile(path.join(__dirname, 'interview/results.html'));
+  res.sendFile(path.join(__dirname, 'results.html'));
 });
 
 // API Routes
@@ -407,6 +425,9 @@ Available Routes:
 - Login: http://localhost:${port}/login
 - Register: http://localhost:${port}/register
 - Dashboard: http://localhost:${port}/dashboard
+- Interview Setup: http://localhost:${port}/interview-setup
+- Agents Demo: http://localhost:${port}/agents
+- WebSocket Demo: http://localhost:${port}/ws-streaming
 
 Demo Credentials:
 - Email: demo@example.com
