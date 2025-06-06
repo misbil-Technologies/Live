@@ -79,11 +79,11 @@
                 <!-- Interview Instructions -->
                 <div class="interview-instructions">
                     <div class="instruction-card">
-                        <h3>🎯 Interview Guidelines</h3>
-                        <ul>
+                        <h3 id="instruction-title">🎯 Interview Guidelines</h3>
+                        <ul id="instruction-list">
                             <li>Emma will welcome you and ask questions one by one</li>
                             <li>Listen carefully to each question before responding</li>
-                            <li>Click "Start Recording" when you're ready to answer</li>
+                            <li id="voice-instruction">Voice activation is enabled - just start speaking to answer</li>
                             <li>Take your time to think before answering</li>
                             <li>Speak clearly and maintain eye contact with the camera</li>
                         </ul>
@@ -102,7 +102,7 @@
                 </div>
 
                 <div class="response-controls">
-                    <div class="audio-controls">
+                    <div class="audio-controls" id="manual-controls">
                         <button id="start-recording-btn" class="record-btn" disabled>
                             <span class="record-icon">🎤</span>
                             <span class="record-text">Start Recording</span>
@@ -110,6 +110,22 @@
                         <button id="stop-recording-btn" class="stop-btn" disabled>
                             <span class="stop-icon">⏹️</span>
                             <span class="stop-text">Stop Recording</span>
+                        </button>
+                    </div>
+                    
+                    <div class="voice-activation-status" id="voice-status" style="display: none;">
+                        <div class="voice-indicator">
+                            <div class="voice-wave">
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                            </div>
+                            <span class="voice-text">Listening for your voice...</span>
+                        </div>
+                        <button id="manual-record-btn" class="manual-trigger-btn">
+                            Click to Record Manually
                         </button>
                     </div>
                     

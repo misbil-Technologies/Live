@@ -22,7 +22,51 @@
         <main class="main-content">
             <div class="welcome-section">
                 <h2>Welcome to Your AI Interview Practice</h2>
-                <p>Select a domain below to start your personalized interview session. Our AI interviewer will ask relevant questions and provide detailed feedback on your responses.</p>
+                <p>Upload your resume and select a domain to start your personalized interview session. Our AI interviewer will ask relevant questions based on your background and provide detailed feedback.</p>
+            </div>
+
+            <!-- Resume Upload Section -->
+            <div class="resume-upload-section">
+                <h3>📄 Upload Your Resume (Optional)</h3>
+                <div class="upload-container">
+                    <div id="resume-drop-zone" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <div class="upload-icon">📄</div>
+                            <h4>Drop your resume here or click to browse</h4>
+                            <p>Supports PDF, DOC, DOCX files (max 5MB)</p>
+                            <input type="file" id="resume-upload" accept=".pdf,.doc,.docx" hidden>
+                            <button type="button" class="browse-btn">Browse Files</button>
+                        </div>
+                    </div>
+                    
+                    <div id="resume-preview" class="resume-preview" style="display: none;">
+                        <div class="file-info">
+                            <div class="file-icon">📄</div>
+                            <div class="file-details">
+                                <span id="file-name" class="file-name"></span>
+                                <span id="file-size" class="file-size"></span>
+                            </div>
+                            <button id="remove-resume" class="remove-btn">✕</button>
+                        </div>
+                        <div class="resume-analysis">
+                            <h4>📊 Resume Analysis</h4>
+                            <div id="resume-insights" class="insights-grid">
+                                <div class="insight-item">
+                                    <span class="insight-label">Experience Level:</span>
+                                    <span id="experience-level" class="insight-value">-</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="insight-label">Key Skills:</span>
+                                    <span id="key-skills" class="insight-value">-</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="insight-label">Suggested Domain:</span>
+                                    <span id="suggested-domain" class="insight-value">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="domain-selection">
@@ -127,6 +171,13 @@
                             <option value="technical" selected>Technical Skills</option>
                             <option value="behavioral">Behavioral Questions</option>
                             <option value="mixed">Mixed (Technical + Behavioral)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="voice-activation">Voice Activation</label>
+                        <select id="voice-activation">
+                            <option value="auto" selected>Auto (Voice Detection)</option>
+                            <option value="manual">Manual (Click to Record)</option>
                         </select>
                     </div>
                 </div>

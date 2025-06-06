@@ -30,6 +30,16 @@ class InterviewSession {
         this.recognition = null;
         this.transcript = '';
         
+        // Voice Activation
+        this.voiceActivationEnabled = true;
+        this.isListening = false;
+        this.silenceTimer = null;
+        this.speechDetected = false;
+        this.voiceThreshold = 0.01;
+        this.silenceThreshold = 2000; // 2 seconds of silence
+        this.minRecordingTime = 1000; // Minimum 1 second recording
+        this.recordingStartTime = null;
+        
         this.init();
     }
 
@@ -39,6 +49,7 @@ class InterviewSession {
         this.setupUI();
         this.setupUserCamera();
         this.setupSpeechRecognition();
+        this.setupVoiceActivation();
         await this.initializeAIAgent();
         this.startTimer();
     }
@@ -68,6 +79,10 @@ class InterviewSession {
         
         this.sessionData = JSON.parse(sessionDataStr);
         this.startTime = new Date();
+        
+        // Check voice activation setting
+        this.voiceActivationEnabled = this.sessionData.settings.voiceActivation === 'auto';
+        
         this.generateQuestions();
     }
 
@@ -79,6 +94,9 @@ class InterviewSession {
         // Update question counter
         this.updateQuestionCounter();
         
+        // Setup voice activation UI
+        this.setupVoiceActivationUI();
+        
         // Bind events
         document.getElementById('start-recording-btn').addEventListener('click', () => this.startRecording());
         document.getElementById('stop-recording-btn').addEventListener('click', () => this.stopRecording());
@@ -88,6 +106,12 @@ class InterviewSession {
         document.getElementById('toggle-camera-btn').addEventListener('click', () => this.toggleCamera());
         document.getElementById('toggle-audio-btn').addEventListener('click', () => this.toggleAudio());
         
+        // Manual record button for voice activation mode
+        const manualRecordBtn = document.getElementById('manual-record-btn');
+        if (manualRecordBtn) {
+            manualRecordBtn.addEventListener('click', () => this.startManualRecording());
+        }
+        
         // Set up video elements
         const idleVideo = document.getElementById('idle-video-element');
         const streamVideo = document.getElementById('stream-video-element');
@@ -96,6 +120,27 @@ class InterviewSession {
         
         // Play idle video initially
         this.playIdleVideo();
+    }
+
+    setupVoiceActivationUI() {
+        const manualControls = document.getElementById('manual-controls');
+        const voiceStatus = document.getElementById('voice-status');
+        const instructionTitle = document.getElementById('instruction-title');
+        const voiceInstruction = document.getElementById('voice-instruction');
+        
+        if (this.voiceActivationEnabled) {
+            // Show voice activation UI
+            manualControls.style.display = 'none';
+            voiceStatus.style.display = 'block';
+            instructionTitle.textContent = '🎤 Voice Activated Interview';
+            voiceInstruction.textContent = 'Voice activation is enabled - just start speaking to answer';
+        } else {
+            // Show manual controls
+            manualControls.style.display = 'flex';
+            voiceStatus.style.display = 'none';
+            instructionTitle.textContent = '🎯 Interview Guidelines';
+            voiceInstruction.textContent = 'Click "Start Recording" when you\'re ready to answer';
+        }
     }
 
     async setupUserCamera() {
@@ -138,7 +183,6 @@ class InterviewSession {
             
             this.recognition.onstart = () => {
                 console.log('Speech recognition started');
-                document.querySelector('.transcription-text').textContent = 'Listening... Start speaking now.';
             };
             
             this.recognition.onresult = (event) => {
@@ -156,12 +200,17 @@ class InterviewSession {
                 
                 this.transcript = finalTranscript;
                 const displayText = finalTranscript + (interimTranscript ? `[${interimTranscript}]` : '');
-                document.querySelector('.transcription-text').textContent = displayText || 'Listening... Start speaking now.';
+                
+                if (this.isRecording) {
+                    document.querySelector('.transcription-text').textContent = displayText || 'Listening... Continue speaking.';
+                }
             };
             
             this.recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
-                document.querySelector('.transcription-text').textContent = `Speech recognition error: ${event.error}. Please try again.`;
+                if (this.isRecording) {
+                    document.querySelector('.transcription-text').textContent = `Speech recognition error: ${event.error}. Your audio is still being recorded.`;
+                }
             };
             
             this.recognition.onend = () => {
@@ -170,18 +219,214 @@ class InterviewSession {
                     // Restart recognition if we're still recording
                     setTimeout(() => {
                         if (this.isRecording) {
-                            this.recognition.start();
+                            try {
+                                this.recognition.start();
+                            } catch (error) {
+                                console.log('Recognition restart error:', error);
+                            }
                         }
                     }, 100);
                 }
             };
         } else {
             console.warn('Speech recognition not supported in this browser');
-            document.querySelector('.transcription-text').textContent = 'Speech recognition not supported in this browser. Your audio will still be recorded.';
         }
     }
 
+    setupVoiceActivation() {
+        if (!this.voiceActivationEnabled) return;
+        
+        // Start listening for voice after AI connects
+        setTimeout(() => {
+            this.startVoiceListening();
+        }, 5000);
+    }
+
+    async startVoiceListening() {
+        if (!this.voiceActivationEnabled || this.isListening) return;
+        
+        try {
+            // Create audio context for voice detection
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 256;
+            
+            // Get microphone stream
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const microphone = this.audioContext.createMediaStreamSource(stream);
+            microphone.connect(this.analyser);
+            
+            this.isListening = true;
+            this.voiceDetectionLoop();
+            
+            console.log('Voice activation started');
+            
+        } catch (error) {
+            console.error('Error starting voice activation:', error);
+            // Fallback to manual mode
+            this.voiceActivationEnabled = false;
+            this.setupVoiceActivationUI();
+        }
+    }
+
+    voiceDetectionLoop() {
+        if (!this.isListening || this.isRecording) {
+            requestAnimationFrame(() => this.voiceDetectionLoop());
+            return;
+        }
+        
+        const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        this.analyser.getByteFrequencyData(dataArray);
+        
+        // Calculate average volume
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        const normalizedVolume = average / 255;
+        
+        // Update voice wave animation
+        this.updateVoiceWave(normalizedVolume);
+        
+        // Detect speech
+        if (normalizedVolume > this.voiceThreshold && !this.speechDetected) {
+            this.speechDetected = true;
+            console.log('Speech detected, starting recording...');
+            this.startVoiceActivatedRecording();
+        }
+        
+        requestAnimationFrame(() => this.voiceDetectionLoop());
+    }
+
+    updateVoiceWave(volume) {
+        const waveBars = document.querySelectorAll('.wave-bar');
+        waveBars.forEach((bar, index) => {
+            const height = Math.max(20, volume * 60 + Math.random() * 20);
+            bar.style.height = `${height}px`;
+        });
+    }
+
+    async startVoiceActivatedRecording() {
+        if (this.isRecording) return;
+        
+        // Setup recording
+        await this.setupAudioRecording();
+        
+        if (!this.mediaRecorder) {
+            console.error('Media recorder not available');
+            return;
+        }
+        
+        // Start recording
+        this.audioChunks = [];
+        this.transcript = '';
+        this.recordingStartTime = Date.now();
+        
+        this.mediaRecorder.start(1000);
+        this.isRecording = true;
+        
+        // Start speech recognition
+        if (this.recognition) {
+            try {
+                this.recognition.start();
+            } catch (error) {
+                console.log('Speech recognition already started or error:', error);
+            }
+        }
+        
+        // Update UI
+        document.getElementById('recording-indicator').classList.add('active');
+        document.querySelector('.transcription-text').textContent = 'Recording started... Please speak your answer.';
+        
+        // Start audio level visualization
+        if (this.audioLevelUpdater) {
+            this.audioLevelUpdater();
+        }
+        
+        // Start silence detection
+        this.startSilenceDetection();
+        
+        console.log('Voice-activated recording started');
+    }
+
+    startSilenceDetection() {
+        if (!this.voiceActivationEnabled || !this.isRecording) return;
+        
+        const checkSilence = () => {
+            if (!this.isRecording) return;
+            
+            const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+            this.analyser.getByteFrequencyData(dataArray);
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            const normalizedVolume = average / 255;
+            
+            if (normalizedVolume < this.voiceThreshold) {
+                // Silence detected
+                if (!this.silenceTimer) {
+                    this.silenceTimer = setTimeout(() => {
+                        // Check minimum recording time
+                        const recordingDuration = Date.now() - this.recordingStartTime;
+                        if (recordingDuration >= this.minRecordingTime) {
+                            console.log('Silence detected, stopping recording...');
+                            this.stopVoiceActivatedRecording();
+                        } else {
+                            // Continue recording, reset silence timer
+                            this.silenceTimer = null;
+                            setTimeout(checkSilence, 100);
+                        }
+                    }, this.silenceThreshold);
+                }
+            } else {
+                // Speech detected, reset silence timer
+                if (this.silenceTimer) {
+                    clearTimeout(this.silenceTimer);
+                    this.silenceTimer = null;
+                }
+            }
+            
+            if (this.isRecording) {
+                setTimeout(checkSilence, 100);
+            }
+        };
+        
+        checkSilence();
+    }
+
+    stopVoiceActivatedRecording() {
+        if (!this.isRecording) return;
+        
+        this.isRecording = false;
+        this.speechDetected = false;
+        
+        // Clear silence timer
+        if (this.silenceTimer) {
+            clearTimeout(this.silenceTimer);
+            this.silenceTimer = null;
+        }
+        
+        // Stop media recorder
+        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            this.mediaRecorder.stop();
+        }
+        
+        // Stop speech recognition
+        if (this.recognition) {
+            this.recognition.stop();
+        }
+        
+        // Update UI
+        document.getElementById('recording-indicator').classList.remove('active');
+        document.querySelector('.transcription-text').textContent = 'Processing your response...';
+        
+        console.log('Voice-activated recording stopped');
+    }
+
+    startManualRecording() {
+        // Temporarily disable voice activation and start manual recording
+        this.isListening = false;
+        this.startRecording();
+    }
+
     async setupAudioRecording() {
+        if (this.mediaRecorder) return; // Already set up
+        
         try {
             // Create a separate audio stream for recording
             this.recordingStream = await navigator.mediaDevices.getUserMedia({ 
@@ -478,7 +723,32 @@ class InterviewSession {
         const questionsCount = Math.ceil(duration / 5);
         
         this.questions = domainQuestions.slice(0, Math.min(questionsCount, domainQuestions.length));
+        
+        // Add resume-based questions if resume was uploaded
+        if (this.sessionData.resumeData && this.sessionData.resumeData.analysis) {
+            this.addResumeBasedQuestions();
+        }
+        
         this.displayCurrentQuestion();
+    }
+
+    addResumeBasedQuestions() {
+        const analysis = this.sessionData.resumeData.analysis;
+        const resumeQuestions = [
+            {
+                question: `I see from your resume that you have experience with ${analysis.keySkills}. Can you tell me about a specific project where you used these skills and what challenges you faced?`,
+                context: "Resume-based experience question",
+                expectedDuration: 180
+            },
+            {
+                question: `Based on your background, you seem to have ${analysis.experienceLevel} experience. How do you stay updated with the latest trends and technologies in your field?`,
+                context: "Professional development question",
+                expectedDuration: 120
+            }
+        ];
+        
+        // Insert resume questions after the first question
+        this.questions.splice(1, 0, ...resumeQuestions);
     }
 
     displayCurrentQuestion() {
@@ -523,9 +793,17 @@ class InterviewSession {
 
             if (response.ok) {
                 console.log('Question sent to avatar successfully');
+                
                 // Enable recording after avatar starts speaking
                 setTimeout(() => {
-                    document.getElementById('start-recording-btn').disabled = false;
+                    if (!this.voiceActivationEnabled) {
+                        document.getElementById('start-recording-btn').disabled = false;
+                    } else {
+                        // Reset voice activation for next response
+                        this.speechDetected = false;
+                        this.isListening = true;
+                        document.querySelector('.transcription-text').textContent = 'Listening for your response... Start speaking when ready.';
+                    }
                 }, 3000);
             }
         } catch (error) {
@@ -556,9 +834,10 @@ class InterviewSession {
         // Reset transcript and audio chunks
         this.transcript = '';
         this.audioChunks = [];
+        this.recordingStartTime = Date.now();
         
         // Start media recorder
-        this.mediaRecorder.start(1000); // Record in 1-second chunks
+        this.mediaRecorder.start(1000);
         this.isRecording = true;
         
         // Start speech recognition if available
@@ -574,6 +853,7 @@ class InterviewSession {
         document.getElementById('start-recording-btn').disabled = true;
         document.getElementById('stop-recording-btn').disabled = false;
         document.getElementById('recording-indicator').classList.add('active');
+        document.querySelector('.transcription-text').textContent = 'Recording... Please speak your answer.';
         
         // Start audio level visualization
         if (this.audioLevelUpdater) {
@@ -626,7 +906,7 @@ class InterviewSession {
             audioBlob: audioBlob,
             transcript: this.transcript.trim(),
             timestamp: new Date().toISOString(),
-            duration: Math.round(audioBlob.size / 1000) // Approximate duration
+            duration: this.recordingStartTime ? Math.round((Date.now() - this.recordingStartTime) / 1000) : 0
         };
         
         this.responses.push(response);
@@ -639,7 +919,8 @@ class InterviewSession {
         console.log('User response recorded:', {
             question: response.question.question,
             transcript: response.transcript,
-            audioSize: audioBlob.size
+            audioSize: audioBlob.size,
+            duration: response.duration
         });
         
         // Move to next question after a delay
@@ -747,6 +1028,9 @@ class InterviewSession {
             if (this.isRecording) {
                 this.stopRecording();
             }
+            
+            // Stop voice listening
+            this.isListening = false;
             
             // Stop user camera and recording streams
             if (this.userStream) {
@@ -884,13 +1168,21 @@ class InterviewSession {
             
             // Send welcome message
             setTimeout(() => {
-                const welcomeMessage = `Hello! Welcome to your ${this.sessionData.domain.replace('-', ' ')} interview. I'm Emma, your AI interviewer. I can see you're ready to begin. I'll be asking you ${this.questions.length} questions today. Feel free to turn on your camera if you'd like. Let's start!`;
+                let welcomeMessage = `Hello! Welcome to your ${this.sessionData.domain.replace('-', ' ')} interview. I'm Emma, your AI interviewer.`;
+                
+                // Add resume-specific welcome if available
+                if (this.sessionData.resumeData && this.sessionData.resumeData.analysis) {
+                    welcomeMessage += ` I've reviewed your resume and see you have experience with ${this.sessionData.resumeData.analysis.keySkills}.`;
+                }
+                
+                welcomeMessage += ` I'll be asking you ${this.questions.length} questions today. Feel free to turn on your camera if you'd like. Let's start!`;
+                
                 this.askQuestionThroughAvatar(welcomeMessage);
                 
                 // Show first question after welcome
                 setTimeout(() => {
                     this.displayCurrentQuestion();
-                }, 10000);
+                }, 12000);
             }, 3000);
         }
     }

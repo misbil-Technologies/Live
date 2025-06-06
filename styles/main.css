@@ -63,6 +63,167 @@ body {
     line-height: 1.6;
 }
 
+/* Resume Upload Section */
+.resume-upload-section {
+    margin-bottom: 3rem;
+}
+
+.resume-upload-section h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #2d3748;
+    text-align: center;
+}
+
+.upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.drop-zone {
+    border: 2px dashed #cbd5e0;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #f7fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: #667eea;
+    background: #edf2f7;
+}
+
+.drop-zone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    opacity: 0.6;
+}
+
+.drop-zone h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.drop-zone p {
+    color: #718096;
+    margin-bottom: 1rem;
+}
+
+.browse-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.browse-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.resume-preview {
+    background: #f7fafc;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.file-icon {
+    font-size: 2rem;
+    color: #667eea;
+}
+
+.file-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.file-size {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.remove-btn {
+    background: #fed7d7;
+    color: #e53e3e;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+    background: #feb2b2;
+}
+
+.resume-analysis h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.insights-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.insight-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.insight-label {
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.insight-value {
+    font-weight: 600;
+    color: #667eea;
+}
+
 .domain-selection h3 {
     font-size: 1.8rem;
     font-weight: 600;
@@ -100,6 +261,25 @@ body {
     background: linear-gradient(135deg, #667eea10, #764ba210);
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
+}
+
+.domain-card.suggested {
+    border-color: #48bb78;
+    background: linear-gradient(135deg, #48bb7810, #38a16910);
+    position: relative;
+}
+
+.domain-card.suggested::before {
+    content: "✨ Recommended";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #48bb78;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .domain-icon {
@@ -240,6 +420,31 @@ body {
     opacity: 0.8;
 }
 
+/* Processing states */
+.processing {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.processing::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #667eea;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -262,6 +467,14 @@ body {
     }
     
     .settings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .drop-zone {
+        padding: 2rem 1rem;
+    }
+    
+    .insights-grid {
         grid-template-columns: 1fr;
     }
 }
