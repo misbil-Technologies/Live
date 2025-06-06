@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/results.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://studio.d-id.com/favicon/favicon-192x192.png">
+</head>
+<body>
+    <div class="results-container">
+        <header class="results-header">
+            <h1>Interview Results</h1>
+            <div class="session-summary">
+                <span id="domain-completed" class="domain-badge">Data Science</span>
+                <span id="completion-time" class="completion-time">Completed in 28:34</span>
+            </div>
+        </header>
+
+        <main class="results-main">
+            <div class="overall-score">
+                <div class="score-circle">
+                    <div class="score-inner">
+                        <span id="overall-score" class="score-number">85</span>
+                        <span class="score-label">Overall Score</span>
+                    </div>
+                </div>
+                <div class="score-breakdown">
+                    <h3>Performance Breakdown</h3>
+                    <div class="breakdown-grid">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Technical Knowledge</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 88%"></div>
+                            </div>
+                            <span class="breakdown-score">88%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Communication</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 82%"></div>
+                            </div>
+                            <span class="breakdown-score">82%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Problem Solving</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="breakdown-score">85%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Confidence</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 78%"></div>
+                            </div>
+                            <span class="breakdown-score">78%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-feedback">
+                <h3>Detailed Question Analysis</h3>
+                <div id="questions-feedback" class="questions-list">
+                    <!-- Questions will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="recommendations">
+                <h3>Recommendations for Improvement</h3>
+                <div class="recommendations-grid">
+                    <div class="recommendation-card strength">
+                        <h4>🎯 Strengths</h4>
+                        <ul id="strengths-list">
+                            <li>Strong technical foundation in machine learning algorithms</li>
+                            <li>Clear explanation of complex concepts</li>
+                            <li>Good use of real-world examples</li>
+                        </ul>
+                    </div>
+                    <div class="recommendation-card improvement">
+                        <h4>📈 Areas for Improvement</h4>
+                        <ul id="improvements-list">
+                            <li>Practice explaining statistical concepts more concisely</li>
+                            <li>Work on confidence when discussing advanced topics</li>
+                            <li>Prepare more specific examples from past projects</li>
+                        </ul>
+                    </div>
+                    <div class="recommendation-card resources">
+                        <h4>📚 Recommended Resources</h4>
+                        <ul id="resources-list">
+                            <li>Review statistical inference concepts</li>
+                            <li>Practice coding problems on LeetCode</li>
+                            <li>Read "Hands-On Machine Learning" by Aurélien Géron</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="download-report-btn" class="action-btn primary">
+                    📄 Download Detailed Report
+                </button>
+                <button id="retake-interview-btn" class="action-btn secondary">
+                    🔄 Retake Interview
+                </button>
+                <button id="new-domain-btn" class="action-btn secondary">
+                    🎯 Try Different Domain
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="scripts/results.js"></script>
+</body>
+</html>

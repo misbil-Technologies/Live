@@ -1,220 +1,151 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>D-ID Streaming POC</title>
-    <!-- added google fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;700&display=swap" rel="stylesheet" />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://studio.d-id.com/favicon/favicon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>AI Interview Assistant</h1>
+                <p>Practice interviews with AI-powered feedback</p>
+            </div>
+        </header>
 
-    <style>
-      .peerConnectionState-new {
-        color: cornflowerblue;
-      }
-      .peerConnectionState-connecting {
-        color: orange;
-      }
-      .peerConnectionState-connected {
-        color: green;
-      }
-      .peerConnectionState-disconnected,
-      .peerConnectionState-closed,
-      .peerConnectionState-failed {
-        color: red;
-      }
+        <main class="main-content">
+            <div class="welcome-section">
+                <h2>Welcome to Your AI Interview Practice</h2>
+                <p>Select a domain below to start your personalized interview session. Our AI interviewer will ask relevant questions and provide detailed feedback on your responses.</p>
+            </div>
 
-      .iceConnectionState-new {
-        color: cornflowerblue;
-      }
-      .iceConnectionState-checking {
-        color: orange;
-      }
-      .iceConnectionState-connected,
-      .iceConnectionState-completed {
-        color: green;
-      }
-      .peerConnectionState-disconnected,
-      .peerConnectionState-closed,
-      .peerConnectionState-failed {
-        color: red;
-      }
+            <div class="domain-selection">
+                <h3>Choose Your Interview Domain</h3>
+                <div class="domain-grid">
+                    <div class="domain-card" data-domain="data-science">
+                        <div class="domain-icon">📊</div>
+                        <h4>Data Science</h4>
+                        <p>Machine learning, statistics, data analysis, and Python/R programming</p>
+                        <ul class="topics-list">
+                            <li>Machine Learning Algorithms</li>
+                            <li>Statistical Analysis</li>
+                            <li>Data Visualization</li>
+                            <li>Python/R Programming</li>
+                        </ul>
+                    </div>
 
-      .iceGatheringState-new {
-        color: cornflowerblue;
-      }
-      .iceGatheringState-gathering {
-        color: orange;
-      }
-      .iceGatheringState-complete {
-        color: black;
-      }
+                    <div class="domain-card" data-domain="software-engineering">
+                        <div class="domain-icon">💻</div>
+                        <h4>Software Engineering</h4>
+                        <p>Programming, system design, algorithms, and software development practices</p>
+                        <ul class="topics-list">
+                            <li>Data Structures & Algorithms</li>
+                            <li>System Design</li>
+                            <li>Object-Oriented Programming</li>
+                            <li>Software Architecture</li>
+                        </ul>
+                    </div>
 
-      .signalingState-stable {
-        color: green;
-      }
-      .signalingState-have-local-offer,
-      .signalingState-have-remote-offer,
-      .signalingState-have-local-pranswer,
-      .signalingState-have-remote-pranswer {
-        color: cornflowerblue;
-      }
-      .signalingState-closed {
-        color: red;
-      }
+                    <div class="domain-card" data-domain="product-management">
+                        <div class="domain-icon">🚀</div>
+                        <h4>Product Management</h4>
+                        <p>Product strategy, user experience, market analysis, and stakeholder management</p>
+                        <ul class="topics-list">
+                            <li>Product Strategy</li>
+                            <li>User Research</li>
+                            <li>Market Analysis</li>
+                            <li>Stakeholder Management</li>
+                        </ul>
+                    </div>
 
-      .streamingState-streaming {
-        color: green;
-      }
+                    <div class="domain-card" data-domain="marketing">
+                        <div class="domain-icon">📈</div>
+                        <h4>Digital Marketing</h4>
+                        <p>Digital campaigns, analytics, content strategy, and brand management</p>
+                        <ul class="topics-list">
+                            <li>Campaign Strategy</li>
+                            <li>Analytics & Metrics</li>
+                            <li>Content Marketing</li>
+                            <li>Brand Management</li>
+                        </ul>
+                    </div>
 
-      .streamingState-empty {
-        color: grey;
-      }
+                    <div class="domain-card" data-domain="finance">
+                        <div class="domain-icon">💰</div>
+                        <h4>Finance</h4>
+                        <p>Financial analysis, investment strategies, risk management, and accounting</p>
+                        <ul class="topics-list">
+                            <li>Financial Modeling</li>
+                            <li>Investment Analysis</li>
+                            <li>Risk Management</li>
+                            <li>Corporate Finance</li>
+                        </ul>
+                    </div>
 
-      .streamEvent-started {
-        color: green;
-      }
+                    <div class="domain-card" data-domain="consulting">
+                        <div class="domain-icon">🎯</div>
+                        <h4>Management Consulting</h4>
+                        <p>Case studies, problem-solving, strategic thinking, and client management</p>
+                        <ul class="topics-list">
+                            <li>Case Study Analysis</li>
+                            <li>Strategic Planning</li>
+                            <li>Problem Solving</li>
+                            <li>Client Relations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-      .streamEvent-done {
-        color: orange;
-      }
+            <div class="interview-settings">
+                <h3>Interview Settings</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="difficulty">Difficulty Level</label>
+                        <select id="difficulty">
+                            <option value="beginner">Beginner (0-2 years)</option>
+                            <option value="intermediate" selected>Intermediate (2-5 years)</option>
+                            <option value="advanced">Advanced (5+ years)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="duration">Interview Duration</label>
+                        <select id="duration">
+                            <option value="15">15 minutes (3-4 questions)</option>
+                            <option value="30" selected>30 minutes (6-8 questions)</option>
+                            <option value="45">45 minutes (10-12 questions)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="focus">Interview Focus</label>
+                        <select id="focus">
+                            <option value="technical" selected>Technical Skills</option>
+                            <option value="behavioral">Behavioral Questions</option>
+                            <option value="mixed">Mixed (Technical + Behavioral)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-      .streamEvent-ready {
-        color: green;
-      }
+            <div class="start-section">
+                <button id="start-interview-btn" class="start-btn" disabled>
+                    <span class="btn-text">Select a domain to start</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+                <p class="start-note">Make sure you have a working microphone and are in a quiet environment</p>
+            </div>
+        </main>
 
-      .streamEvent-error {
-        color: red;
-      }
-
-      .streamEvent-dont-care {
-        color: gray;
-      }
-
-      /* added css from here */
-
-      body * {
-        font-family: 'Mulish', sans-serif;
-        text-align: center;
-      }
-
-      #content {
-        width: 820px;
-        position: relative;
-        margin: 0 auto;
-      }
-
-      .button-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .button-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-      }
-
-      button {
-        padding: 10px 20px;
-        border-radius: 5px;
-        border: none;
-        font-size: 16px;
-        margin: 0 5px;
-        background-color: #7459fe;
-        color: #fff;
-      }
-
-      button:hover {
-        background-color: #9480ff;
-        cursor: pointer;
-        transition: all 0.2s ease-out;
-      }
-
-      #status {
-        clear: both;
-        padding: 20px 0 0 0;
-        text-align: left;
-        display: inline-block;
-        zoom: 1;
-        line-height: 140%;
-        font-size: 15px;
-      }
-
-      #status div {
-        padding-bottom: 10px;
-      }
-
-      #video-wrapper {
-        background: url(bg.png);
-        height: 500px;
-        background-position: top;
-      }
-
-      #video-wrapper div {
-        position: relative;
-        height: 100%;
-        width: 400px;
-        margin: 0 auto;
-      }
-
-      video {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        /*border:1px solid;*/
-        border-radius: 50%;
-        background-color: #fff;
-
-        object-fit: cover;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-image: url("alex_v2_idle_image.png");
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- adde "id=content" -->
-    <div id="content">
-      <!-- added "id=video-wrapper" -->
-      <div id="video-wrapper">
-        <div>
-          <video id="idle-video-element" width="400" height="400" autoplay loop style="opacity: 1"></video>
-          <video id="stream-video-element" width="400" height="400" autoplay style="opacity: 0"></video>
-        </div>
-      </div>
-      <br />
-
-      <!-- added div#buttons -->
-      <div class="button-container">
-        <div class="button-row">
-          <button id="connect-button" type="button">Connect</button>
-          <button id="destroy-button" type="button">Destroy</button>
-        </div>
-        <div class="button-row">
-          <button id="audio-button" type="button">Audio</button>
-          <button id="text-button" type="button">Text</button>
-          <button id="llm-button" type="button">LLM</button>
-        </div>
-      </div>
-
-      <!-- added div#status -->
-      <div id="status">
-        <!-- removed the wrapping <div> tags -->
-        ICE gathering status: <label id="ice-gathering-status-label"></label><br />
-        ICE status: <label id="ice-status-label"></label><br />
-        Peer connection status: <label id="peer-status-label"></label><br />
-        Signaling status: <label id="signaling-status-label"></label><br />
-        Last stream event: <label id="stream-event-label"></label><br />
-        Streaming status: <label id="streaming-status-label"></label><br />
-      </div>
+        <footer class="footer">
+            <p>Powered by AI • Practice makes perfect</p>
+        </footer>
     </div>
 
-    <script type="module" src="./streaming-client-api.js"></script>
-  </body>
+    <script src="scripts/domain-selection.js"></script>
+</body>
 </html>

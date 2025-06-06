@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview in Progress</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/interview.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://studio.d-id.com/favicon/favicon-192x192.png">
+</head>
+<body>
+    <div class="interview-container">
+        <header class="interview-header">
+            <div class="interview-info">
+                <h1>AI Interview Session</h1>
+                <div class="session-details">
+                    <span id="domain-display" class="domain-badge">Data Science</span>
+                    <span id="question-counter" class="question-counter">Question 1 of 8</span>
+                    <span id="timer" class="timer">29:45</span>
+                </div>
+            </div>
+            <button id="end-interview-btn" class="end-btn">End Interview</button>
+        </header>
+
+        <main class="interview-main">
+            <div class="interviewer-section">
+                <div class="video-container">
+                    <video id="idle-video-element" width="400" height="400" autoplay loop muted></video>
+                    <video id="stream-video-element" width="400" height="400" autoplay></video>
+                    <div class="video-overlay">
+                        <div id="connection-status" class="connection-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Connecting...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interviewer-info">
+                    <h3>Emma - AI Interviewer</h3>
+                    <p>Senior Technical Interviewer</p>
+                </div>
+            </div>
+
+            <div class="interaction-section">
+                <div class="question-display">
+                    <h3>Current Question</h3>
+                    <div id="current-question" class="question-text">
+                        Connecting to your AI interviewer...
+                    </div>
+                    <div id="question-context" class="question-context"></div>
+                </div>
+
+                <div class="response-controls">
+                    <div class="audio-controls">
+                        <button id="start-recording-btn" class="record-btn" disabled>
+                            <span class="record-icon">🎤</span>
+                            <span class="record-text">Start Recording</span>
+                        </button>
+                        <button id="stop-recording-btn" class="stop-btn" disabled>
+                            <span class="stop-icon">⏹️</span>
+                            <span class="stop-text">Stop Recording</span>
+                        </button>
+                    </div>
+                    
+                    <div class="recording-status">
+                        <div id="recording-indicator" class="recording-indicator">
+                            <span class="pulse-dot"></span>
+                            <span>Recording...</span>
+                        </div>
+                        <div id="audio-level" class="audio-level">
+                            <div class="level-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="response-feedback">
+                    <div id="transcription" class="transcription">
+                        <h4>Your Response (Live Transcription)</h4>
+                        <p class="transcription-text">Start speaking to see your response here...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="progress-info">
+                <span>Interview Progress</span>
+                <span id="progress-percentage">12.5%</span>
+            </div>
+        </div>
+
+        <!-- Connection Status Panel -->
+        <div id="status-panel" class="status-panel">
+            <h4>Connection Status</h4>
+            <div class="status-grid">
+                <div class="status-item">
+                    <span>ICE Status:</span>
+                    <label id="ice-status-label" class="status-value">-</label>
+                </div>
+                <div class="status-item">
+                    <span>Peer Connection:</span>
+                    <label id="peer-status-label" class="status-value">-</label>
+                </div>
+                <div class="status-item">
+                    <span>Streaming:</span>
+                    <label id="streaming-status-label" class="status-value">-</label>
+                </div>
+                <div class="status-item">
+                    <span>Stream Event:</span>
+                    <label id="stream-event-label" class="status-value">-</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/interview-session.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+</html>
