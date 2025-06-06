@@ -22,10 +22,13 @@ class InterviewSession {
         this.videoIsPlaying = false;
         this.isStreamReady = false;
         
-        // User Camera
+        // User Camera and Audio
         this.userStream = null;
+        this.recordingStream = null;
         this.isCameraOn = false;
         this.isMuted = false;
+        this.recognition = null;
+        this.transcript = '';
         
         this.init();
     }
@@ -35,7 +38,7 @@ class InterviewSession {
         this.loadSessionData();
         this.setupUI();
         this.setupUserCamera();
-        this.setupAudioRecording();
+        this.setupSpeechRecognition();
         await this.initializeAIAgent();
         this.startTimer();
     }
@@ -120,6 +123,121 @@ class InterviewSession {
         } catch (error) {
             console.error('Error accessing user media:', error);
             this.updateCameraStatus('error');
+        }
+    }
+
+    setupSpeechRecognition() {
+        // Check if browser supports speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+            
+            this.recognition.continuous = true;
+            this.recognition.interimResults = true;
+            this.recognition.lang = 'en-US';
+            
+            this.recognition.onstart = () => {
+                console.log('Speech recognition started');
+                document.querySelector('.transcription-text').textContent = 'Listening... Start speaking now.';
+            };
+            
+            this.recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                this.transcript = finalTranscript;
+                const displayText = finalTranscript + (interimTranscript ? `[${interimTranscript}]` : '');
+                document.querySelector('.transcription-text').textContent = displayText || 'Listening... Start speaking now.';
+            };
+            
+            this.recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                document.querySelector('.transcription-text').textContent = `Speech recognition error: ${event.error}. Please try again.`;
+            };
+            
+            this.recognition.onend = () => {
+                console.log('Speech recognition ended');
+                if (this.isRecording) {
+                    // Restart recognition if we're still recording
+                    setTimeout(() => {
+                        if (this.isRecording) {
+                            this.recognition.start();
+                        }
+                    }, 100);
+                }
+            };
+        } else {
+            console.warn('Speech recognition not supported in this browser');
+            document.querySelector('.transcription-text').textContent = 'Speech recognition not supported in this browser. Your audio will still be recorded.';
+        }
+    }
+
+    async setupAudioRecording() {
+        try {
+            // Create a separate audio stream for recording
+            this.recordingStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+            
+            this.mediaRecorder = new MediaRecorder(this.recordingStream, {
+                mimeType: 'audio/webm;codecs=opus'
+            });
+            
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    this.audioChunks.push(event.data);
+                }
+            };
+            
+            this.mediaRecorder.onstop = () => {
+                this.processRecording();
+            };
+            
+            this.setupAudioVisualization(this.recordingStream);
+            
+        } catch (error) {
+            console.error('Error setting up audio recording:', error);
+            alert('Please allow microphone access to continue with the interview.');
+        }
+    }
+
+    setupAudioVisualization(stream) {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            microphone.connect(analyser);
+            analyser.fftSize = 256;
+            
+            const updateAudioLevel = () => {
+                if (this.isRecording) {
+                    analyser.getByteFrequencyData(dataArray);
+                    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                    const percentage = Math.min((average / 128) * 100, 100);
+                    
+                    document.querySelector('.level-bar').style.width = `${percentage}%`;
+                    requestAnimationFrame(updateAudioLevel);
+                }
+            };
+            
+            this.audioLevelUpdater = updateAudioLevel;
+        } catch (error) {
+            console.error('Error setting up audio visualization:', error);
         }
     }
 
@@ -408,7 +526,7 @@ class InterviewSession {
                 // Enable recording after avatar starts speaking
                 setTimeout(() => {
                     document.getElementById('start-recording-btn').disabled = false;
-                }, 2000);
+                }, 3000);
             }
         } catch (error) {
             console.error('Failed to send question to avatar:', error);
@@ -424,73 +542,45 @@ class InterviewSession {
         document.getElementById('progress-percentage').textContent = `${Math.round(progress)}%`;
     }
 
-    async setupAudioRecording() {
-        try {
-            // Use the same stream for recording if available, otherwise request new one
-            let stream = this.userStream;
-            if (!stream) {
-                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            }
-            
-            this.mediaRecorder = new MediaRecorder(stream);
-            
-            this.mediaRecorder.ondataavailable = (event) => {
-                this.audioChunks.push(event.data);
-            };
-            
-            this.mediaRecorder.onstop = () => {
-                this.processRecording();
-            };
-            
-            this.setupAudioVisualization(stream);
-            
-        } catch (error) {
-            console.error('Error accessing microphone:', error);
-            alert('Please allow microphone access to continue with the interview.');
+    async startRecording() {
+        // Setup audio recording if not already done
+        if (!this.mediaRecorder) {
+            await this.setupAudioRecording();
         }
-    }
-
-    setupAudioVisualization(stream) {
-        const audioContext = new AudioContext();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(stream);
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
         
-        microphone.connect(analyser);
-        analyser.fftSize = 256;
-        
-        const updateAudioLevel = () => {
-            analyser.getByteFrequencyData(dataArray);
-            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-            const percentage = (average / 255) * 100;
-            
-            document.querySelector('.level-bar').style.width = `${percentage}%`;
-            
-            if (this.isRecording) {
-                requestAnimationFrame(updateAudioLevel);
-            }
-        };
-        
-        this.audioLevelUpdater = updateAudioLevel;
-    }
-
-    startRecording() {
         if (!this.mediaRecorder) {
             alert('Microphone not available. Please refresh and allow microphone access.');
             return;
         }
         
+        // Reset transcript and audio chunks
+        this.transcript = '';
         this.audioChunks = [];
-        this.mediaRecorder.start();
+        
+        // Start media recorder
+        this.mediaRecorder.start(1000); // Record in 1-second chunks
         this.isRecording = true;
         
+        // Start speech recognition if available
+        if (this.recognition) {
+            try {
+                this.recognition.start();
+            } catch (error) {
+                console.log('Speech recognition already started or error:', error);
+            }
+        }
+        
+        // Update UI
         document.getElementById('start-recording-btn').disabled = true;
         document.getElementById('stop-recording-btn').disabled = false;
         document.getElementById('recording-indicator').classList.add('active');
-        document.querySelector('.transcription-text').textContent = 'Recording in progress...';
         
-        this.audioLevelUpdater();
+        // Start audio level visualization
+        if (this.audioLevelUpdater) {
+            this.audioLevelUpdater();
+        }
         
+        // Auto-stop after 5 minutes
         this.recordingTimeout = setTimeout(() => {
             if (this.isRecording) {
                 this.stopRecording();
@@ -501,13 +591,24 @@ class InterviewSession {
     stopRecording() {
         if (!this.isRecording) return;
         
-        this.mediaRecorder.stop();
         this.isRecording = false;
         
+        // Stop media recorder
+        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            this.mediaRecorder.stop();
+        }
+        
+        // Stop speech recognition
+        if (this.recognition) {
+            this.recognition.stop();
+        }
+        
+        // Clear timeout
         if (this.recordingTimeout) {
             clearTimeout(this.recordingTimeout);
         }
         
+        // Update UI
         document.getElementById('start-recording-btn').disabled = false;
         document.getElementById('stop-recording-btn').disabled = true;
         document.getElementById('recording-indicator').classList.remove('active');
@@ -515,38 +616,36 @@ class InterviewSession {
     }
 
     processRecording() {
-        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+        // Create audio blob from recorded chunks
+        const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm;codecs=opus' });
         
+        // Store the actual user response
         const response = {
             questionIndex: this.currentQuestionIndex,
             question: this.questions[this.currentQuestionIndex],
             audioBlob: audioBlob,
+            transcript: this.transcript.trim(),
             timestamp: new Date().toISOString(),
-            duration: this.audioChunks.length
+            duration: Math.round(audioBlob.size / 1000) // Approximate duration
         };
         
         this.responses.push(response);
         
-        setTimeout(() => {
-            const mockTranscription = this.generateMockTranscription();
-            document.querySelector('.transcription-text').textContent = mockTranscription;
-            
-            setTimeout(() => {
-                this.nextQuestion();
-            }, 2000);
-        }, 1500);
-    }
-
-    generateMockTranscription() {
-        const mockResponses = [
-            "Thank you for the question. In my experience with machine learning, supervised learning involves training models with labeled data where we know the correct output...",
-            "That's a great question about data preprocessing. When dealing with missing data, I typically start by understanding the nature and pattern of the missingness...",
-            "Communication is crucial in data science. I remember a project where I had to explain our recommendation algorithm to the marketing team...",
-            "Overfitting is definitely a common challenge. I usually address it through several techniques including cross-validation, regularization, and feature selection...",
-            "Feature selection is critical for model performance. My approach typically involves both statistical methods and domain knowledge..."
-        ];
+        // Display the actual transcript
+        const finalTranscript = this.transcript.trim() || 'Audio recorded successfully (no transcript available)';
+        document.querySelector('.transcription-text').textContent = finalTranscript;
         
-        return mockResponses[this.currentQuestionIndex % mockResponses.length];
+        // Log the response for debugging
+        console.log('User response recorded:', {
+            question: response.question.question,
+            transcript: response.transcript,
+            audioSize: audioBlob.size
+        });
+        
+        // Move to next question after a delay
+        setTimeout(() => {
+            this.nextQuestion();
+        }, 3000);
     }
 
     nextQuestion() {
@@ -586,8 +685,37 @@ class InterviewSession {
     }
 
     calculateOverallScore() {
-        const baseScore = 70 + Math.random() * 25;
-        return Math.round(baseScore);
+        // Calculate score based on actual responses
+        let totalScore = 0;
+        let responseCount = 0;
+        
+        this.responses.forEach(response => {
+            let score = 70; // Base score
+            
+            // Add points for transcript length (indicates detailed response)
+            if (response.transcript && response.transcript.length > 50) {
+                score += 10;
+            }
+            if (response.transcript && response.transcript.length > 200) {
+                score += 10;
+            }
+            
+            // Add points for audio duration (indicates thoughtful response)
+            if (response.duration > 30) {
+                score += 5;
+            }
+            if (response.duration > 60) {
+                score += 5;
+            }
+            
+            // Random variation for realism
+            score += Math.random() * 10 - 5;
+            
+            totalScore += Math.max(0, Math.min(100, score));
+            responseCount++;
+        });
+        
+        return responseCount > 0 ? Math.round(totalScore / responseCount) : 70;
     }
 
     startTimer() {
@@ -615,9 +743,17 @@ class InterviewSession {
                 clearInterval(this.timerInterval);
             }
             
-            // Stop user camera
+            // Stop recording if active
+            if (this.isRecording) {
+                this.stopRecording();
+            }
+            
+            // Stop user camera and recording streams
             if (this.userStream) {
                 this.userStream.getTracks().forEach(track => track.stop());
+            }
+            if (this.recordingStream) {
+                this.recordingStream.getTracks().forEach(track => track.stop());
             }
             
             this.completeInterview();
