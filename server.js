@@ -10,15 +10,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Routes
+// Routes - Landing page should be served at root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'landing.html'));
 });
 
+// Interview setup page (the one currently showing)
 app.get('/interview-setup', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Other routes
 app.get('/interview', (req, res) => {
   res.sendFile(path.join(__dirname, 'interview.html'));
 });
