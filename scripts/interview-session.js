@@ -22,6 +22,11 @@ class InterviewSession {
         this.videoIsPlaying = false;
         this.isStreamReady = false;
         
+        // User Camera
+        this.userStream = null;
+        this.isCameraOn = false;
+        this.isMuted = false;
+        
         this.init();
     }
 
@@ -29,6 +34,7 @@ class InterviewSession {
         await this.loadDIDAPI();
         this.loadSessionData();
         this.setupUI();
+        this.setupUserCamera();
         this.setupAudioRecording();
         await this.initializeAIAgent();
         this.startTimer();
@@ -75,6 +81,10 @@ class InterviewSession {
         document.getElementById('stop-recording-btn').addEventListener('click', () => this.stopRecording());
         document.getElementById('end-interview-btn').addEventListener('click', () => this.endInterview());
         
+        // Camera controls
+        document.getElementById('toggle-camera-btn').addEventListener('click', () => this.toggleCamera());
+        document.getElementById('toggle-audio-btn').addEventListener('click', () => this.toggleAudio());
+        
         // Set up video elements
         const idleVideo = document.getElementById('idle-video-element');
         const streamVideo = document.getElementById('stream-video-element');
@@ -83,6 +93,130 @@ class InterviewSession {
         
         // Play idle video initially
         this.playIdleVideo();
+    }
+
+    async setupUserCamera() {
+        try {
+            // Request camera and microphone permissions
+            this.userStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                }, 
+                audio: true 
+            });
+            
+            const userVideo = document.getElementById('user-video');
+            userVideo.srcObject = this.userStream;
+            
+            // Initially turn off camera (video track)
+            this.userStream.getVideoTracks().forEach(track => {
+                track.enabled = false;
+            });
+            
+            this.updateCameraStatus();
+            
+        } catch (error) {
+            console.error('Error accessing user media:', error);
+            this.updateCameraStatus('error');
+        }
+    }
+
+    toggleCamera() {
+        if (!this.userStream) {
+            alert('Camera not available. Please refresh and allow camera access.');
+            return;
+        }
+
+        const videoTracks = this.userStream.getVideoTracks();
+        if (videoTracks.length > 0) {
+            this.isCameraOn = !this.isCameraOn;
+            videoTracks[0].enabled = this.isCameraOn;
+            
+            const userVideo = document.getElementById('user-video');
+            const videoContainer = userVideo.parentElement;
+            
+            if (this.isCameraOn) {
+                userVideo.classList.add('active');
+                videoContainer.classList.add('camera-active');
+            } else {
+                userVideo.classList.remove('active');
+                videoContainer.classList.remove('camera-active');
+            }
+            
+            this.updateCameraStatus();
+            this.updateCameraButton();
+        }
+    }
+
+    toggleAudio() {
+        if (!this.userStream) {
+            alert('Microphone not available. Please refresh and allow microphone access.');
+            return;
+        }
+
+        const audioTracks = this.userStream.getAudioTracks();
+        if (audioTracks.length > 0) {
+            this.isMuted = !this.isMuted;
+            audioTracks[0].enabled = !this.isMuted;
+            
+            this.updateAudioButton();
+        }
+    }
+
+    updateCameraStatus(status = null) {
+        const statusElement = document.querySelector('#camera-status .camera-text');
+        const statusDot = document.querySelector('.camera-dot');
+        
+        if (status === 'error') {
+            statusElement.textContent = 'Camera Error';
+            statusDot.classList.remove('active');
+            statusDot.classList.add('off');
+            document.getElementById('camera-status-label').textContent = 'Error';
+        } else if (this.isCameraOn) {
+            statusElement.textContent = 'Camera On';
+            statusDot.classList.add('active');
+            statusDot.classList.remove('off');
+            document.getElementById('camera-status-label').textContent = 'On';
+        } else {
+            statusElement.textContent = 'Camera Off';
+            statusDot.classList.remove('active');
+            statusDot.classList.add('off');
+            document.getElementById('camera-status-label').textContent = 'Off';
+        }
+    }
+
+    updateCameraButton() {
+        const button = document.getElementById('toggle-camera-btn');
+        const icon = button.querySelector('.btn-icon');
+        const text = button.querySelector('.btn-text');
+        
+        if (this.isCameraOn) {
+            button.classList.add('active');
+            icon.textContent = '📹';
+            text.textContent = 'Turn Off Camera';
+        } else {
+            button.classList.remove('active');
+            icon.textContent = '📹';
+            text.textContent = 'Turn On Camera';
+        }
+    }
+
+    updateAudioButton() {
+        const button = document.getElementById('toggle-audio-btn');
+        const icon = button.querySelector('.btn-icon');
+        const text = button.querySelector('.btn-text');
+        
+        if (this.isMuted) {
+            button.classList.add('muted');
+            icon.textContent = '🔇';
+            text.textContent = 'Unmute';
+        } else {
+            button.classList.remove('muted');
+            icon.textContent = '🎤';
+            text.textContent = 'Mute';
+        }
     }
 
     generateQuestions() {
@@ -292,7 +426,12 @@ class InterviewSession {
 
     async setupAudioRecording() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Use the same stream for recording if available, otherwise request new one
+            let stream = this.userStream;
+            if (!stream) {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+            
             this.mediaRecorder = new MediaRecorder(stream);
             
             this.mediaRecorder.ondataavailable = (event) => {
@@ -475,6 +614,12 @@ class InterviewSession {
             if (this.timerInterval) {
                 clearInterval(this.timerInterval);
             }
+            
+            // Stop user camera
+            if (this.userStream) {
+                this.userStream.getTracks().forEach(track => track.stop());
+            }
+            
             this.completeInterview();
         }
     }
@@ -603,13 +748,13 @@ class InterviewSession {
             
             // Send welcome message
             setTimeout(() => {
-                const welcomeMessage = `Hello! Welcome to your ${this.sessionData.domain.replace('-', ' ')} interview. I'm Emma, your AI interviewer. Are you ready to begin? I'll be asking you ${this.questions.length} questions today.`;
+                const welcomeMessage = `Hello! Welcome to your ${this.sessionData.domain.replace('-', ' ')} interview. I'm Emma, your AI interviewer. I can see you're ready to begin. I'll be asking you ${this.questions.length} questions today. Feel free to turn on your camera if you'd like. Let's start!`;
                 this.askQuestionThroughAvatar(welcomeMessage);
                 
                 // Show first question after welcome
                 setTimeout(() => {
                     this.displayCurrentQuestion();
-                }, 8000);
+                }, 10000);
             }, 3000);
         }
     }

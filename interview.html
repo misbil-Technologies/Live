@@ -25,29 +25,73 @@
         </header>
 
         <main class="interview-main">
-            <div class="interviewer-section">
-                <div class="video-container">
-                    <video id="idle-video-element" width="400" height="400" autoplay loop muted></video>
-                    <video id="stream-video-element" width="400" height="400" autoplay></video>
-                    <div class="video-overlay">
-                        <div id="connection-status" class="connection-status">
-                            <span class="status-dot"></span>
-                            <span class="status-text">Connecting...</span>
+            <!-- Video Call Section -->
+            <div class="video-call-section">
+                <div class="participants-grid">
+                    <!-- AI Interviewer -->
+                    <div class="participant ai-interviewer">
+                        <div class="video-container">
+                            <video id="idle-video-element" width="400" height="400" autoplay loop muted></video>
+                            <video id="stream-video-element" width="400" height="400" autoplay></video>
+                            <div class="video-overlay">
+                                <div id="connection-status" class="connection-status">
+                                    <span class="status-dot"></span>
+                                    <span class="status-text">Connecting...</span>
+                                </div>
+                            </div>
+                            <div class="participant-label">
+                                <span class="participant-name">Emma - AI Interviewer</span>
+                                <span class="participant-role">Senior Technical Interviewer</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Webcam -->
+                    <div class="participant user-participant">
+                        <div class="video-container">
+                            <video id="user-video" autoplay muted playsinline></video>
+                            <div class="video-overlay">
+                                <div id="camera-status" class="connection-status">
+                                    <span class="camera-dot"></span>
+                                    <span class="camera-text">Camera Off</span>
+                                </div>
+                            </div>
+                            <div class="participant-label">
+                                <span class="participant-name">You</span>
+                                <span class="participant-role">Interview Candidate</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Camera Controls -->
+                        <div class="camera-controls">
+                            <button id="toggle-camera-btn" class="control-btn camera-btn">
+                                <span class="btn-icon">📹</span>
+                                <span class="btn-text">Turn On Camera</span>
+                            </button>
+                            <button id="toggle-audio-btn" class="control-btn audio-btn">
+                                <span class="btn-icon">🎤</span>
+                                <span class="btn-text">Mute</span>
+                            </button>
                         </div>
                     </div>
                 </div>
-                
-                <div class="interviewer-info">
-                    <h3>Emma - AI Interviewer</h3>
-                    <p>Senior Technical Interviewer</p>
-                    <div class="avatar-instructions">
-                        <p>🎤 Emma will welcome you and ask questions</p>
-                        <p>🎯 Listen carefully and respond when prompted</p>
-                        <p>⏱️ Take your time to think before answering</p>
+
+                <!-- Interview Instructions -->
+                <div class="interview-instructions">
+                    <div class="instruction-card">
+                        <h3>🎯 Interview Guidelines</h3>
+                        <ul>
+                            <li>Emma will welcome you and ask questions one by one</li>
+                            <li>Listen carefully to each question before responding</li>
+                            <li>Click "Start Recording" when you're ready to answer</li>
+                            <li>Take your time to think before answering</li>
+                            <li>Speak clearly and maintain eye contact with the camera</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
+            <!-- Interaction Panel -->
             <div class="interaction-section">
                 <div class="question-display">
                     <h3>Current Question</h3>
@@ -116,8 +160,8 @@
                     <label id="streaming-status-label" class="status-value">-</label>
                 </div>
                 <div class="status-item">
-                    <span>Stream Event:</span>
-                    <label id="stream-event-label" class="status-value">-</label>
+                    <span>User Camera:</span>
+                    <label id="camera-status-label" class="status-value">Off</label>
                 </div>
             </div>
         </div>
