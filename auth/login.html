@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Misbil AI Interview Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/auth.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://studio.d-id.com/favicon/favicon-192x192.png">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="brand">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center" alt="Misbil Logo" class="brand-logo">
+                    <span class="brand-name">Misbil AI Interview</span>
+                </div>
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue your interview practice journey</p>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="auth-btn" id="login-btn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display: none;">Signing in...</span>
+                </button>
+
+                <div class="demo-credentials">
+                    <h4>Demo Credentials</h4>
+                    <div class="demo-info">
+                        <strong>Email:</strong> demo@example.com<br>
+                        <strong>Password:</strong> demo123
+                    </div>
+                    <button type="button" id="use-demo" class="demo-btn">Use Demo Account</button>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/register">Sign up here</a></p>
+                <p><a href="/">← Back to Home</a></p>
+            </div>
+        </div>
+
+        <div class="auth-visual">
+            <div class="visual-content">
+                <h2>Practice Makes Perfect</h2>
+                <p>Join thousands of professionals who have improved their interview skills with our AI-powered platform.</p>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"This platform helped me land my dream job at Google. The AI feedback was incredibly detailed and actionable."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face" alt="User">
+                            <div>
+                                <strong>Alex Johnson</strong>
+                                <span>Software Engineer at Google</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Misbil AI Interview Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://studio.d-id.com/favicon/favicon-192x192.png">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center" alt="Misbil Logo" class="brand-logo">
+                    <span class="brand-name">Misbil AI</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#new-interview" class="nav-item" data-section="new-interview">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">New Interview</span>
+                </a>
+                <a href="#interview-history" class="nav-item" data-section="interview-history">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Interview History</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-section="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#profile" class="nav-item" data-section="profile">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Profile</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <img id="user-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="User">
+                    </div>
+                    <div class="user-details">
+                        <span id="user-name" class="user-name">Loading...</span>
+                        <span id="user-plan" class="user-plan">Free Plan</span>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn">
+                    <span class="logout-icon">🚪</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h1>Welcome back, <span id="welcome-name">User</span>!</h1>
+                    <p>Ready to practice your interview skills today?</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="total-interviews">0</span>
+                            <span class="stat-label">Total Interviews</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="avg-score">0%</span>
+                            <span class="stat-label">Average Score</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="total-time">0h</span>
+                            <span class="stat-label">Practice Time</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🚀</div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="interviews-remaining">3</span>
+                            <span class="stat-label">Interviews Remaining</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <button class="action-btn primary" data-section="new-interview">
+                                <span class="btn-icon">🎯</span>
+                                <div class="btn-content">
+                                    <strong>Start New Interview</strong>
+                                    <span>Practice with AI interviewer Emma</span>
+                                </div>
+                            </button>
+                            <button class="action-btn secondary" data-section="interview-history">
+                                <span class="btn-icon">📋</span>
+                                <div class="btn-content">
+                                    <strong>View History</strong>
+                                    <span>Review past interviews</span>
+                                </div>
+                            </button>
+                            <button class="action-btn secondary" data-section="analytics">
+                                <span class="btn-icon">📈</span>
+                                <div class="btn-content">
+                                    <strong>View Analytics</strong>
+                                    <span>Track your progress</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="recent-interviews">
+                        <h3>Recent Interviews</h3>
+                        <div id="recent-interviews-list" class="interviews-list">
+                            <div class="empty-state">
+                                <span class="empty-icon">📝</span>
+                                <p>No interviews yet</p>
+                                <span>Start your first interview to see results here</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Interview Section -->
+            <section id="new-interview-section" class="content-section">
+                <div class="section-header">
+                    <h1>Start New Interview</h1>
+                    <p>Configure your interview settings and begin practicing</p>
+                </div>
+
+                <div class="interview-setup">
+                    <!-- Resume Upload -->
+                    <div class="setup-card">
+                        <h3>📄 Upload Your Resume (Optional)</h3>
+                        <div class="upload-container">
+                            <div id="resume-drop-zone" class="drop-zone">
+                                <div class="drop-zone-content">
+                                    <div class="upload-icon">📄</div>
+                                    <h4>Drop your resume here or click to browse</h4>
+                                    <p>Supports PDF, DOC, DOCX files (max 5MB)</p>
+                                    <input type="file" id="resume-upload" accept=".pdf,.doc,.docx" hidden>
+                                    <button type="button" class="browse-btn">Browse Files</button>
+                                </div>
+                            </div>
+                            
+                            <div id="resume-preview" class="resume-preview" style="display: none;">
+                                <div class="file-info">
+                                    <div class="file-icon">📄</div>
+                                    <div class="file-details">
+                                        <span id="file-name" class="file-name"></span>
+                                        <span id="file-size" class="file-size"></span>
+                                    </div>
+                                    <button id="remove-resume" class="remove-btn">✕</button>
+                                </div>
+                                <div class="resume-analysis">
+                                    <h4>📊 Resume Analysis</h4>
+                                    <div id="resume-insights" class="insights-grid">
+                                        <div class="insight-item">
+                                            <span class="insight-label">Experience Level:</span>
+                                            <span id="experience-level" class="insight-value">-</span>
+                                        </div>
+                                        <div class="insight-item">
+                                            <span class="insight-label">Key Skills:</span>
+                                            <span id="key-skills" class="insight-value">-</span>
+                                        </div>
+                                        <div class="insight-item">
+                                            <span class="insight-label">Suggested Domain:</span>
+                                            <span id="suggested-domain" class="insight-value">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Domain Selection -->
+                    <div class="setup-card">
+                        <h3>🎯 Choose Interview Domain</h3>
+                        <div class="domain-grid">
+                            <div class="domain-card" data-domain="data-science">
+                                <div class="domain-icon">📊</div>
+                                <h4>Data Science</h4>
+                                <p>Machine learning, statistics, data analysis</p>
+                            </div>
+                            <div class="domain-card" data-domain="software-engineering">
+                                <div class="domain-icon">💻</div>
+                                <h4>Software Engineering</h4>
+                                <p>Programming, system design, algorithms</p>
+                            </div>
+                            <div class="domain-card" data-domain="product-management">
+                                <div class="domain-icon">🚀</div>
+                                <h4>Product Management</h4>
+                                <p>Product strategy, user experience</p>
+                            </div>
+                            <div class="domain-card" data-domain="marketing">
+                                <div class="domain-icon">📈</div>
+                                <h4>Digital Marketing</h4>
+                                <p>Digital campaigns, analytics</p>
+                            </div>
+                            <div class="domain-card" data-domain="finance">
+                                <div class="domain-icon">💰</div>
+                                <h4>Finance</h4>
+                                <p>Financial analysis, investment</p>
+                            </div>
+                            <div class="domain-card" data-domain="consulting">
+                                <div class="domain-icon">🎯</div>
+                                <h4>Consulting</h4>
+                                <p>Case studies, strategic thinking</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interview Settings -->
+                    <div class="setup-card">
+                        <h3>⚙️ Interview Settings</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label for="difficulty">Difficulty Level</label>
+                                <select id="difficulty">
+                                    <option value="beginner">Beginner (0-2 years)</option>
+                                    <option value="intermediate" selected>Intermediate (2-5 years)</option>
+                                    <option value="advanced">Advanced (5+ years)</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label for="duration">Interview Duration</label>
+                                <select id="duration">
+                                    <option value="15">15 minutes (3-4 questions)</option>
+                                    <option value="30" selected>30 minutes (6-8 questions)</option>
+                                    <option value="45">45 minutes (10-12 questions)</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label for="focus">Interview Focus</label>
+                                <select id="focus">
+                                    <option value="technical" selected>Technical Skills</option>
+                                    <option value="behavioral">Behavioral Questions</option>
+                                    <option value="mixed">Mixed (Technical + Behavioral)</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label for="voice-activation">Voice Activation</label>
+                                <select id="voice-activation">
+                                    <option value="auto" selected>Auto (Voice Detection)</option>
+                                    <option value="manual">Manual (Click to Record)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="start-section">
+                        <button id="start-interview-btn" class="start-btn" disabled>
+                            <span class="btn-text">Select a domain to start</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interview History Section -->
+            <section id="interview-history-section" class="content-section">
+                <div class="section-header">
+                    <h1>Interview History</h1>
+                    <p>Review your past interviews and track your progress</p>
+                </div>
+
+                <div class="history-filters">
+                    <div class="filter-group">
+                        <label for="domain-filter">Domain:</label>
+                        <select id="domain-filter">
+                            <option value="">All Domains</option>
+                            <option value="data-science">Data Science</option>
+                            <option value="software-engineering">Software Engineering</option>
+                            <option value="product-management">Product Management</option>
+                            <option value="marketing">Digital Marketing</option>
+                            <option value="finance">Finance</option>
+                            <option value="consulting">Consulting</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="status-filter">Status:</label>
+                        <select id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="created">Created</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="interview-history-list" class="history-list">
+                    <div class="empty-state">
+                        <span class="empty-icon">📝</span>
+                        <p>No interviews found</p>
+                        <span>Start your first interview to see history here</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics-section" class="content-section">
+                <div class="section-header">
+                    <h1>Performance Analytics</h1>
+                    <p>Track your progress and identify areas for improvement</p>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>📊 Score Trends</h3>
+                        <div class="chart-placeholder">
+                            <p>Score progression chart will appear here after completing interviews</p>
+                        </div>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>🎯 Domain Performance</h3>
+                        <div class="domain-performance">
+                            <div class="performance-item">
+                                <span class="domain-name">Data Science</span>
+                                <div class="performance-bar">
+                                    <div class="performance-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="performance-score">-</span>
+                            </div>
+                            <div class="performance-item">
+                                <span class="domain-name">Software Engineering</span>
+                                <div class="performance-bar">
+                                    <div class="performance-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="performance-score">-</span>
+                            </div>
+                            <div class="performance-item">
+                                <span class="domain-name">Product Management</span>
+                                <div class="performance-bar">
+                                    <div class="performance-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="performance-score">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>⏱️ Time Analysis</h3>
+                        <div class="time-stats">
+                            <div class="time-stat">
+                                <span class="time-label">Total Practice Time</span>
+                                <span class="time-value" id="total-practice-time">0 hours</span>
+                            </div>
+                            <div class="time-stat">
+                                <span class="time-label">Average Session</span>
+                                <span class="time-value" id="avg-session-time">0 minutes</span>
+                            </div>
+                            <div class="time-stat">
+                                <span class="time-label">This Week</span>
+                                <span class="time-value" id="week-practice-time">0 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>🎯 Improvement Areas</h3>
+                        <div class="improvement-areas">
+                            <div class="improvement-item">
+                                <span class="improvement-skill">Communication</span>
+                                <span class="improvement-score">Needs Work</span>
+                            </div>
+                            <div class="improvement-item">
+                                <span class="improvement-skill">Technical Knowledge</span>
+                                <span class="improvement-score">Good</span>
+                            </div>
+                            <div class="improvement-item">
+                                <span class="improvement-skill">Problem Solving</span>
+                                <span class="improvement-score">Excellent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile-section" class="content-section">
+                <div class="section-header">
+                    <h1>Profile Settings</h1>
+                    <p>Manage your account and subscription</p>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="profile-card">
+                        <h3>👤 Personal Information</h3>
+                        <form id="profile-form" class="profile-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profile-firstName">First Name</label>
+                                    <input type="text" id="profile-firstName" name="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-lastName">Last Name</label>
+                                    <input type="text" id="profile-lastName" name="lastName" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email">Email Address</label>
+                                <input type="email" id="profile-email" name="email" required readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-company">Company</label>
+                                <input type="text" id="profile-company" name="company">
+                            </div>
+                            <button type="submit" class="save-btn">Save Changes</button>
+                        </form>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3>💳 Subscription</h3>
+                        <div class="subscription-info">
+                            <div class="current-plan">
+                                <span class="plan-name" id="current-plan">Free Plan</span>
+                                <span class="plan-status">Active</span>
+                            </div>
+                            <div class="plan-details">
+                                <div class="plan-feature">
+                                    <span>Interviews Remaining:</span>
+                                    <span id="plan-interviews">3</span>
+                                </div>
+                                <div class="plan-feature">
+                                    <span>Advanced Analytics:</span>
+                                    <span class="feature-disabled">❌</span>
+                                </div>
+                                <div class="plan-feature">
+                                    <span>Priority Support:</span>
+                                    <span class="feature-disabled">❌</span>
+                                </div>
+                            </div>
+                            <button class="upgrade-btn">Upgrade Plan</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../scripts/dashboard.js"></script>
+</body>
+</html>
