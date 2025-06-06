@@ -16,6 +16,8 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from root directory
 app.use(express.static(__dirname));
 
 // Session configuration
@@ -78,7 +80,7 @@ const authenticateToken = (req, res, next) => {
 
 // Routes
 
-// Landing page (main homepage)
+// Landing page (main homepage) - NEW PROFESSIONAL LANDING PAGE
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'landing.html'));
 });
@@ -125,7 +127,7 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard/dashboard.html'));
 });
 
-// Interview pages (protected)
+// Protected interview pages
 app.get('/interview-session', (req, res) => {
   if (!req.session.token) {
     return res.redirect('/login');
