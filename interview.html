@@ -40,6 +40,11 @@
                 <div class="interviewer-info">
                     <h3>Emma - AI Interviewer</h3>
                     <p>Senior Technical Interviewer</p>
+                    <div class="avatar-instructions">
+                        <p>🎤 Emma will welcome you and ask questions</p>
+                        <p>🎯 Listen carefully and respond when prompted</p>
+                        <p>⏱️ Take your time to think before answering</p>
+                    </div>
                 </div>
             </div>
 
@@ -47,7 +52,7 @@
                 <div class="question-display">
                     <h3>Current Question</h3>
                     <div id="current-question" class="question-text">
-                        Connecting to your AI interviewer...
+                        Connecting to your AI interviewer... Emma will welcome you shortly and begin the interview.
                     </div>
                     <div id="question-context" class="question-context"></div>
                 </div>
@@ -78,7 +83,7 @@
                 <div class="response-feedback">
                     <div id="transcription" class="transcription">
                         <h4>Your Response (Live Transcription)</h4>
-                        <p class="transcription-text">Start speaking to see your response here...</p>
+                        <p class="transcription-text">Wait for Emma to welcome you and ask the first question...</p>
                     </div>
                 </div>
             </div>
@@ -90,7 +95,7 @@
             </div>
             <div class="progress-info">
                 <span>Interview Progress</span>
-                <span id="progress-percentage">12.5%</span>
+                <span id="progress-percentage">0%</span>
             </div>
         </div>
 
@@ -119,6 +124,5 @@
     </div>
 
     <script src="scripts/interview-session.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>
 </html>

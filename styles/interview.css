@@ -103,6 +103,7 @@ body {
     border-radius: 50%;
     overflow: hidden;
     background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
 }
 
 .video-container video {
@@ -114,16 +115,17 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
+    transition: opacity 0.5s ease;
 }
 
 #idle-video-element {
     opacity: 1;
-    transition: opacity 0.5s ease;
+    z-index: 1;
 }
 
 #stream-video-element {
     opacity: 0;
-    transition: opacity 0.5s ease;
+    z-index: 2;
 }
 
 .video-overlay {
@@ -169,6 +171,20 @@ body {
 
 .interviewer-info p {
     color: #a0aec0;
+    margin-bottom: 1rem;
+}
+
+.avatar-instructions {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: left;
+}
+
+.avatar-instructions p {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: #cbd5e0;
 }
 
 .interaction-section {
@@ -196,6 +212,7 @@ body {
     font-size: 1.1rem;
     line-height: 1.6;
     margin-bottom: 1rem;
+    min-height: 120px;
 }
 
 .question-context {
@@ -339,7 +356,7 @@ body {
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #667eea, #764ba2);
-    width: 12.5%;
+    width: 0%;
     transition: width 0.3s ease;
 }
 
