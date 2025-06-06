@@ -10,13 +10,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Routes - Landing page should be served at root
+// IMPORTANT: Landing page should be served at root
 app.get('/', (req, res) => {
+  console.log('Serving landing page at root /');
   res.sendFile(path.join(__dirname, 'landing.html'));
 });
 
-// Interview setup page (the one currently showing)
+// Interview setup page (the old index.html)
 app.get('/interview-setup', (req, res) => {
+  console.log('Serving interview setup page');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -45,6 +47,12 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard/dashboard.html'));
 });
 
+// Catch all other routes and redirect to landing
+app.get('*', (req, res) => {
+  console.log(`Unknown route ${req.path}, redirecting to landing page`);
+  res.redirect('/');
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`
@@ -52,9 +60,9 @@ app.listen(port, () => {
 ================================
 Server running on: http://localhost:${port}
 
-Available Routes:
-- Landing Page: http://localhost:${port}
-- Interview Setup: http://localhost:${port}/interview-setup
+IMPORTANT: Root URL serves the NEW landing page!
+- Landing Page (NEW): http://localhost:${port}
+- Interview Setup (OLD): http://localhost:${port}/interview-setup
 - Interview Session: http://localhost:${port}/interview
 - Results: http://localhost:${port}/results
 - Login: http://localhost:${port}/login
