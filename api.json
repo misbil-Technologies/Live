@@ -1,7 +1,0 @@
-{
-  "key": "aW1yYW5pbW11MjgwQGdtYWlsLmNvbQ:UPQybhzJ-HQ9qCceNu_jv",
-  "url": "https://api.d-id.com",
-  "websocketUrl": "wss://ws-api.d-id.com",
-  "service": "talks",
-  "elevenlabsKey": "sk_c196bcd4ba28f16ec10ade725ae1df91e754ba19420efc93"
-}
